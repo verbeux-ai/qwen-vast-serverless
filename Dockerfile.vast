@@ -1,4 +1,4 @@
-FROM lmsysorg/sglang:latest
+FROM lmsysorg/sglang:v0.5.12-cu128-b200
 
 RUN printf '#!/bin/bash\nwget -qO /tmp/onstart.sh "$ONSTART_PATH" && bash /tmp/onstart.sh\n' \
     > /usr/local/bin/onstart_wget.sh && chmod +x /usr/local/bin/onstart_wget.sh
