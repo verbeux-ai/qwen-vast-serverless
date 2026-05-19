@@ -31,6 +31,7 @@ nohup python3 -m sglang.launch_server \
     --speculative-num-draft-tokens 4 \
     --mamba-scheduler-strategy extra_buffer \
     --attention-backend flashinfer \
+    --enable-metrics \
     --trust-remote-code \
     > "$MODEL_LOG" 2>&1 &
 
