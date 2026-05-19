@@ -24,6 +24,7 @@ nohup python3 -m sglang.launch_server \
     --kv-cache-dtype fp8_e4m3 \
     --reasoning-parser qwen3 \
     --tool-call-parser qwen3_coder \
+    --mamba-scheduler-strategy extra_buffer \
     --attention-backend flashinfer \
     --enable-metrics \
     --trust-remote-code \
