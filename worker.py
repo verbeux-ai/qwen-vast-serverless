@@ -6,11 +6,11 @@ from vastai import Worker, WorkerConfig, HandlerConfig, LogActionConfig, Benchma
 
 MODEL_SERVER_URL = "http://127.0.0.1"
 MODEL_SERVER_PORT = 8000
-MODEL_LOG_FILE = "/var/log/sglang.log"
+MODEL_LOG_FILE = "/var/log/vllm.log"
 MODEL_HEALTHCHECK_ENDPOINT = "/health"
 
 MODEL_LOAD_LOG_MSG = [
-    "The server is fired up and ready to roll!",
+    "Application startup complete.",
 ]
 
 MODEL_ERROR_LOG_MSGS = [

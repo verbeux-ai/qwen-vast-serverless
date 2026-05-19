@@ -2,10 +2,9 @@
 set -e
 
 # --- PyWorker env vars ---
-# (NÃO setar USE_SYSTEM_PYTHON=true: bug no start_server.sh pula o git clone do repo)
 export WORKER_PORT="${WORKER_PORT:-3000}"
 export REPORT_ADDR="${REPORT_ADDR:-https://run.vast.ai}"
-export MODEL_LOG="/var/log/sglang.log"
+export MODEL_LOG="/var/log/vllm.log"
 export PYWORKER_REPO="${PYWORKER_REPO:-https://github.com/ImPedro29/qwen-vast-serverless}"
 export MODEL_NAME="${MODEL_NAME:-qwen3.6-27b}"
 export HF_REPO="${HF_REPO:-AEON-7/Qwen3.6-27B-AEON-Ultimate-Uncensored-Multimodal-NVFP4-MTP}"
@@ -22,31 +21,19 @@ else
     echo "Modelo já em cache."
 fi
 
-# --- SGLang em background, log no MODEL_LOG (todas features habilitadas) ---
+# --- vLLM em background ---
 mkdir -p /var/log
-echo "Iniciando SGLang em background -> $MODEL_LOG"
-nohup python3 -m sglang.launch_server \
-    --model-path /workspace/model \
-    --tp-size 1 \
-    --host 0.0.0.0 --port 8000 \
-    --context-length 262144 \
-    --mem-fraction-static 0.85 \
-    --chunked-prefill-size 2096 \
-    --max-running-requests 8 \
-    --quantization compressed-tensors \
-    --kv-cache-dtype fp8_e4m3 \
-    --reasoning-parser qwen3 \
-    --tool-call-parser qwen3_coder \
-    --speculative-algorithm NEXTN \
-    --speculative-num-steps 3 \
-    --speculative-eagle-topk 1 \
-    --speculative-num-draft-tokens 4 \
-    --mamba-scheduler-strategy extra_buffer \
-    --attention-backend triton \
-    --served-model-name "$MODEL_NAME" \
-    --enable-metrics \
-    --enable-cache-report \
+echo "Iniciando vLLM em background -> $MODEL_LOG"
+nohup vllm serve /workspace/model \
+    --quantization modelopt \
     --trust-remote-code \
+    --max-model-len 262144 \
+    --gpu-memory-utilization 0.94 \
+    --enable-chunked-prefill \
+    --enable-prefix-caching \
+    --speculative-config '{"method":"qwen3_5_mtp","num_speculative_tokens":3}' \
+    --host 0.0.0.0 --port 8000 \
+    --served-model-name "$MODEL_NAME" \
     > "$MODEL_LOG" 2>&1 &
 
 # --- PyWorker (foreground) ---

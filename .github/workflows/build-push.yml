@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - Dockerfile.vast
+      - Dockerfile.vast-vllm
       - .github/workflows/build-push.yml
   workflow_dispatch:
 
@@ -38,7 +39,7 @@ jobs:
         id: owner
         run: echo "lc=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
-      - name: Build and push
+      - name: Build and push (SGLang)
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -46,7 +47,20 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/${{ steps.owner.outputs.lc }}/qwen-vast-serverless:latest
-            ghcr.io/${{ steps.owner.outputs.lc }}/qwen-vast-serverless:${{ github.sha }}
+            ghcr.io/${{ steps.owner.outputs.lc }}/qwen-vast-sglang:latest
+            ghcr.io/${{ steps.owner.outputs.lc }}/qwen-vast-sglang:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push (vLLM)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.vast-vllm
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ steps.owner.outputs.lc }}/qwen-vast-vllm:latest
+            ghcr.io/${{ steps.owner.outputs.lc }}/qwen-vast-vllm:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

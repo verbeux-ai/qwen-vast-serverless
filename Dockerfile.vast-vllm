@@ -1,0 +1,6 @@
+FROM vllm/vllm-openai:latest
+
+RUN apt-get install -y wget 2>/dev/null || true
+
+RUN printf '#!/bin/bash\nwget -qO /tmp/onstart.sh "$ONSTART_PATH" && bash /tmp/onstart.sh\n' \
+    > /usr/local/bin/onstart_wget.sh && chmod +x /usr/local/bin/onstart_wget.sh
